@@ -1,61 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+<p align="center">Payment & Notification Service</p>
 
 <p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
+Este proyecto es una implementación de un servicio de pagos asíncrono desarrollado con Laravel. El objetivo es procesar transacciones de forma eficiente y garantizar que las notificaciones a los clientes se entreguen incluso si los servicios externos presentan fallos.
 </p>
 
-## About Laravel
+## Características
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Procesamiento de Pagos: Registro inmediato de transacciones con estado SUCCESS.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Arquitectura Asíncrona: Uso de colas (Queues) para el envío de notificaciones (Email/SMS simulado).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Resiliencia: Sistema de reintentos automáticos para garantizar que ninguna notificación se pierda si el servicio de mensajería está caído.
 
-## Learning Laravel
+Desacoplamiento: La lógica de negocio del pago es independiente de la lógica de notificación.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Requisitos Técnicos
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+PHP 8.x
 
-## Laravel Sponsors
+Composer
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+MySQL / MariaDB
 
-### Premium Partners
+Docker (Opcional, si usas Laravel Sail)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+## Instalación y Configuración
 
-## Contributing
+Clonar el repositorio:
+git clone https://github.com/JuanGuerra22/laravel-payment-service
+cd TU_REPO
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Instalar dependencias:
 
-## Code of Conduct
+composer install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Configurar el entorno:
+Copia el archivo de ejemplo: cp .env.example .env
 
-## Security Vulnerabilities
+Configura tus credenciales de base de datos en el archivo .env.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Importante: Asegúrate de que QUEUE_CONNECTION=database para habilitar el encolamiento.
 
-## License
+## Generar la clave de la aplicación y ejecutar migraciones:
+php artisan key:generate
+php artisan migrate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Ejecución del Proyecto
+
+Para probar el flujo completo, necesitas ejecutar tres procesos en paralelo:
+
+## Servidor de la API:
+php artisan serve
+## Procesador de Colas (Worker):
+php artisan queue:work
+## Pruebas de la API
+Puedes probar el endpoint de pagos enviando una petición POST a /api/pay.
+Ejemplo con CURL:
+curl -X POST http://localhost:8000/api/pay \
+     -H "Content-Type: application/json" \
+     -d '{"amount": 100.00, "email": "usuario@ejemplo.com"}'
+
+## Respuesta esperada:
+{
+    "message": "Pago registrado. Notificación en camino."
+}
